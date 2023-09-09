@@ -18,6 +18,16 @@ auto normalMultiTypeAddFunctiontem(T x, T y, T z) -> decltype(x + y + z) {
   return x + y + z;
 }
 
+float highOrderFunctionForThreeVariableFunc(const float x, const float y,
+                                            const float z) {
+  return x * x + 2 * y * y * y + 1 / z;
+}
+
+double highOrderFunctionForThreeVariableFunc2(const double x, const double y,
+                                              const double z) {
+  return x * x + 2 * x * y + y / z;
+}
+
 TEST(FUNCTIONTEST, FunctionInput) {
   auto lambda_func = [](int i) { return i + 1; };
   auto lambda_res =
@@ -128,6 +138,128 @@ TEST(FUNCTIONTEST, ArrayInput) {
       normalMultiTypeAddFunctiontem<float>, normal_input);
   const int normal_function_expected_res = 11.0f;
   EXPECT_EQ(normal_function_res, normal_function_expected_res);
+}
+
+TEST(FUNCTIONTEST, ContainerInputGradientForwardStep) {
+  auto lambda_func = [](const float i, float j) { return 2 * i + 3 * j; };
+  std::vector<float> lambda_input{2.0, 3.0};
+  const double epsilon = 1e-3;
+  const double tolerance_error = 1e-1;
+
+  auto lambda_res = MyOptimization::BaseMath::
+      GetNumericnGrandientForContainerByForwardDifference<
+          decltype(lambda_func), decltype(lambda_input), float, 2>(
+          lambda_func, lambda_input, epsilon);
+
+  const std::vector<float> expected_lambda_gradients_output{2.0f, 3.0f};
+  for (auto i = 0U; i < lambda_res.size(); ++i) {
+    EXPECT_LT(std::abs(lambda_res[i] - expected_lambda_gradients_output[i]),
+              tolerance_error);
+  }
+
+  // highOrderFunctionForThreeVariableFunc : x * x + 2 * y * y * y + 1 / z;
+  std::vector<float> func_input{2.0, 3.0, 4.0};
+  auto func_res = MyOptimization::BaseMath::
+      GetNumericnGrandientForContainerByForwardDifference<
+          decltype(highOrderFunctionForThreeVariableFunc), decltype(func_input),
+          float, 3>(highOrderFunctionForThreeVariableFunc, func_input, epsilon);
+  const std::vector<float> expected_func_gradients_output{4.0f, 54.0f,
+                                                          -(1 / 16)};
+  for (auto i = 0U; i < func_res.size(); ++i) {
+    EXPECT_LT(std::abs(func_res[i] - expected_func_gradients_output[i]),
+              tolerance_error);
+  }
+}
+
+TEST(FUNCTIONTEST, ArrayInputGradientForwardStep) {
+  auto lambda_func = [](const double i, double j) { return 2 * i + 3 * j; };
+  std::array<double, 2> lambda_input{2.0, 3.0};
+  const double epsilon = 1e-4;
+  const double tolerance_error = 2 * 1e-1;
+
+  auto lambda_res =
+      MyOptimization::BaseMath::GetNumericGrandientForArrayByForwardDifference<
+          decltype(lambda_func), double, 2>(lambda_func, lambda_input, epsilon);
+
+  const std::vector<double> expected_lambda_gradients_output{2.0f, 3.0f};
+  for (auto i = 0U; i < lambda_res.size(); ++i) {
+    EXPECT_LT(std::abs(lambda_res[i] - expected_lambda_gradients_output[i]),
+              tolerance_error);
+  }
+
+  // highOrderFunctionForThreeVariableFunc2 : x * x + 2 * x * y + y / z;
+  std::array<double, 3> func_input{2.0, 3.0, 4.0};
+  auto func_res =
+      MyOptimization::BaseMath::GetNumericGrandientForArrayByForwardDifference<
+          decltype(highOrderFunctionForThreeVariableFunc2), double, 3>(
+          highOrderFunctionForThreeVariableFunc2, func_input, epsilon);
+  const std::vector<double> expected_func_gradients_output{10.0f, 4.25f,
+                                                           -(3 / 16)};
+  for (auto i = 0U; i < func_res.size(); ++i) {
+    EXPECT_LT(std::abs(func_res[i] - expected_func_gradients_output[i]),
+              tolerance_error);
+  }
+}
+
+TEST(FUNCTIONTEST, ContainerInputGradientCentralStep) {
+  auto lambda_func = [](const float i, float j) { return 2 * i + 3 * j; };
+  std::vector<float> lambda_input{2.0, 3.0};
+  const double epsilon = 1e-3;
+  const double tolerance_error = 1e-1;
+
+  auto lambda_res = MyOptimization::BaseMath::
+      GetNumericnGrandientForContainerByCenteralDifference<
+          decltype(lambda_func), decltype(lambda_input), float, 2>(
+          lambda_func, lambda_input, epsilon);
+
+  const std::vector<float> expected_lambda_gradients_output{2.0f, 3.0f};
+  for (auto i = 0U; i < lambda_res.size(); ++i) {
+    EXPECT_LT(std::abs(lambda_res[i] - expected_lambda_gradients_output[i]),
+              tolerance_error);
+  }
+
+  // highOrderFunctionForThreeVariableFunc : x * x + 2 * y * y * y + 1 / z;
+  std::vector<float> func_input{2.0, 3.0, 4.0};
+  auto func_res = MyOptimization::BaseMath::
+      GetNumericnGrandientForContainerByCenteralDifference<
+          decltype(highOrderFunctionForThreeVariableFunc), decltype(func_input),
+          float, 3>(highOrderFunctionForThreeVariableFunc, func_input, epsilon);
+  const std::vector<float> expected_func_gradients_output{4.0f, 54.0f,
+                                                          -(1 / 16)};
+  for (auto i = 0U; i < func_res.size(); ++i) {
+    EXPECT_LT(std::abs(func_res[i] - expected_func_gradients_output[i]),
+              tolerance_error);
+  }
+}
+
+TEST(FUNCTIONTEST, ArrayInputGradientCenteralStep) {
+  auto lambda_func = [](const double i, double j) { return 2 * i + 3 * j; };
+  std::array<double, 2> lambda_input{2.0, 3.0};
+  const double epsilon = 1e-4;
+  const double tolerance_error = 2 * 1e-1;
+
+  auto lambda_res =
+      MyOptimization::BaseMath::GetNumericGrandientForArrayByCenteralDifference<
+          decltype(lambda_func), double, 2>(lambda_func, lambda_input, epsilon);
+
+  const std::vector<double> expected_lambda_gradients_output{2.0f, 3.0f};
+  for (auto i = 0U; i < lambda_res.size(); ++i) {
+    EXPECT_LT(std::abs(lambda_res[i] - expected_lambda_gradients_output[i]),
+              tolerance_error);
+  }
+
+  // highOrderFunctionForThreeVariableFunc2 : x * x + 2 * x * y + y / z;
+  std::array<double, 3> func_input{2.0, 3.0, 4.0};
+  auto func_res =
+      MyOptimization::BaseMath::GetNumericGrandientForArrayByCenteralDifference<
+          decltype(highOrderFunctionForThreeVariableFunc2), double, 3>(
+          highOrderFunctionForThreeVariableFunc2, func_input, epsilon);
+  const std::vector<double> expected_func_gradients_output{10.0f, 4.25f,
+                                                           -(3 / 16)};
+  for (auto i = 0U; i < func_res.size(); ++i) {
+    EXPECT_LT(std::abs(func_res[i] - expected_func_gradients_output[i]),
+              tolerance_error);
+  }
 }
 
 }  // namespace
