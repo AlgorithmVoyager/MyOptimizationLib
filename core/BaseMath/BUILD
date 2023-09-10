@@ -19,7 +19,7 @@ cc_library(
 cc_binary(
     name = "main",
     srcs = ["main.cpp"],
-    deps = ["//core/BaseMath:function"],
+    deps = ["//core/BaseMath:function","@com_github_google_glog//:glog"],
     copts = ["-std=c++17","-Wall", "-Werror", "-Wextra"],
     visibility = ["//visibility:public"],
 )

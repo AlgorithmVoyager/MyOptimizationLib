@@ -1,3 +1,6 @@
+#include <glog/logging.h>
 
-
-int main() { return 0; }
+int main() {
+  google::InitGoogleLogging("main_cpp");
+  return 0;
+}
