@@ -1,18 +1,18 @@
 cc_library(
     name = "armijo",
-    srcs = ["armijo_condition.cpp"],
+    srcs = [],
     hdrs = ["armijo_condition.h"],
     visibility = ["//visibility:public"],
     deps = [
         "//core/BaseMath:function",
         "//core/ConvexOptimization/SteepestGradientDescent/utils",
-        "@com_github_google_glog//:glog",
+        "//logging:log",
     ],
 )
 
 cc_library(
     name = "steepest_gradient_descent",
-    srcs = ["steepest_gradient_descent.cpp"],
+    srcs = [],
     hdrs = ["steepest_gradient_descent.h"],
     copts = [
         "-std=c++17",
@@ -25,6 +25,5 @@ cc_library(
         "//core/BaseMath:function",
         "//core/ConvexOptimization/SteepestGradientDescent:armijo",
         "//core/ConvexOptimization/SteepestGradientDescent/utils",
-        "@com_github_google_glog//:glog",
     ],
 )
