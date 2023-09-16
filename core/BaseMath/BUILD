@@ -1,25 +1,29 @@
 cc_library(
     name = "container",
-	hdrs = ["container.h"],
-    srcs = ["container.cpp"],
-    copts = ["-std=c++17","-Wall", "-Werror", "-Wextra"],
-     visibility = ["//visibility:public"],
+    srcs = [],
+    hdrs = ["container.h"],
+    copts = [
+        "-std=c++17",
+        "-Wall",
+        "-Werror",
+        "-Wextra",
+    ],
+    visibility = ["//visibility:public"],
 )
 
 cc_library(
     name = "function",
-	hdrs = ["function.h"],
-    srcs = ["function.cpp"],
-    copts = ["-std=c++17","-Wall", "-Werror", "-Wextra"],
-    deps =["//core/BaseMath:container"],
+    srcs = [],
+    hdrs = ["function.h"],
+    copts = [
+        "-std=c++17",
+        "-Wall",
+        "-Werror",
+        "-Wextra",
+    ],
     visibility = ["//visibility:public"],
-)
-
-
-cc_binary(
-    name = "main",
-    srcs = ["main.cpp"],
-    deps = ["//core/BaseMath:function"],
-    copts = ["-std=c++17","-Wall", "-Werror", "-Wextra"],
-    visibility = ["//visibility:public"],
+    deps = [
+        "//core/BaseMath:container",
+        "//logging:log",
+    ],
 )

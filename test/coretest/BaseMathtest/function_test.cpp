@@ -29,19 +29,34 @@ double highOrderFunctionForThreeVariableFunc2(const double x, const double y,
 }
 
 TEST(FUNCTIONTEST, FunctionInput) {
-  auto lambda_func = [](int i) { return i + 1; };
+  auto lambda_func = [](int i) -> decltype(i + 1) { return i + 1; };
+  // lambda_func normal anonymous, so decltype(lambda) will lead to a Error
+  std::function<int(int)> std_function_of_lambda = lambda_func;
+  std::function<decltype(normalAddOneFunction)> std_function_of_normal_func =
+      normalAddOneFunction;
+
   auto lambda_res =
       MyOptimization::BaseMath::GetValue<int(int), int>(lambda_func, 1);
   auto normal_function_res = MyOptimization::BaseMath::GetValue<int(int), int>(
       normalAddOneFunction, 1);
+  auto std_function_of_lambda_res =
+      MyOptimization::BaseMath::GetValue<decltype(std_function_of_lambda), int>(
+          std_function_of_lambda, 1);
+  auto std_function_of_normal_func_res =
+      MyOptimization::BaseMath::GetValue<decltype(std_function_of_normal_func),
+                                         int>(std_function_of_normal_func, 1);
 
   const int expected_res = 2;
   EXPECT_EQ(lambda_res, expected_res);
   EXPECT_EQ(normal_function_res, expected_res);
+  EXPECT_EQ(std_function_of_lambda_res, expected_res);
+  EXPECT_EQ(std_function_of_normal_func_res, expected_res);
 }
 
 TEST(FUNCTIONTEST, MultiFunctionInput) {
   auto lambda_func = [](int i, int j) { return i + j; };
+  auto std_function_of_lambda = lambda_func;
+  auto std_function_of_normal_func = normalMultiTypeAddFunction;
 
   auto lambda_res =
       MyOptimization::BaseMath::GetFuncValueForMultiInput<int(int, int), int>(
@@ -52,6 +67,12 @@ TEST(FUNCTIONTEST, MultiFunctionInput) {
   auto normal_multi_type_add_function_res =
       MyOptimization::BaseMath::GetFuncValueForMultiInput(
           normalMultiTypeAddFunction, 1, 1.0f, 2.0);
+  auto std_function_of_lambda_res =
+      MyOptimization::BaseMath::GetFuncValueForMultiInput<
+          decltype(std_function_of_lambda), int>(std_function_of_lambda, 1, 2);
+  auto std_function_of_normal_func_res =
+      MyOptimization::BaseMath::GetFuncValueForMultiInput(
+          std_function_of_normal_func, 1, 1, 2.0f);
 
   const int lambda_expected_res = 2;
   const int normal_multi_add_function_expected_res = 3;
@@ -61,6 +82,9 @@ TEST(FUNCTIONTEST, MultiFunctionInput) {
   EXPECT_EQ(normal_multi_add_function_res,
             normal_multi_add_function_expected_res);
   EXPECT_EQ(normal_multi_type_add_function_res,
+            normal_multi_type_add_function_expected_res);
+  EXPECT_EQ(std_function_of_lambda_res, normal_multi_add_function_expected_res);
+  EXPECT_EQ(std_function_of_normal_func_res,
             normal_multi_type_add_function_expected_res);
 }
 
@@ -101,6 +125,10 @@ TEST(FUNCTIONTEST, ContainerCovert) {
 
 TEST(FUNCTIONTEST, ContainerInput) {
   auto lambda_func = [](const int i, int j) { return i + j; };
+  std::function<int(int, int)> std_function_for_lambda = lambda_func;
+  std::function<decltype(normalMultiTypeAddFunction)>
+      std_function_for_normal_func = normalMultiTypeAddFunction;
+
   std::vector<int> lambda_input{2, 3};
 
   auto lambda_res_r =
@@ -110,28 +138,42 @@ TEST(FUNCTIONTEST, ContainerInput) {
   auto lambda_res_l = MyOptimization::BaseMath::GetFuncValueForContainer<
       decltype(lambda_func), decltype(lambda_input), 2>(lambda_func,
                                                         lambda_input);
+  auto std_function_for_lambda_res =
+      MyOptimization::BaseMath::GetFuncValueForContainer<
+          decltype(std_function_for_lambda), decltype(lambda_input), 2>(
+          std_function_for_lambda, lambda_input);
 
   const int lambda_expected_res = 5.0;
   EXPECT_EQ(lambda_res_r, lambda_expected_res);
   EXPECT_EQ(lambda_res_l, lambda_expected_res);
+  EXPECT_EQ(std_function_for_lambda_res, lambda_expected_res);
 
   std::vector<int> normal_input{2, 3, 4};
   auto normal_function_res = MyOptimization::BaseMath::GetFuncValueForContainer<
       decltype(normalMultiTypeAddFunction), std::vector<int>, 3>(
       normalMultiTypeAddFunction, normal_input);
+  auto std_function_for_normal_func_res =
+      MyOptimization::BaseMath::GetFuncValueForContainer<
+          decltype(std_function_for_normal_func), std::vector<int>, 3>(
+          std_function_for_normal_func, normal_input);
   const int normal_function_expected_res = 9.0;
   EXPECT_EQ(normal_function_res, normal_function_expected_res);
+  EXPECT_EQ(std_function_for_normal_func_res, normal_function_expected_res);
 }
 
 TEST(FUNCTIONTEST, ArrayInput) {
   auto lambda_func = [](const int i, int j) { return i + j; };
+  std::function<int(int, int)> std_function_lambda = lambda_func;
   std::array<int, 2> lambda_input{2, 3};
 
   auto lambda_res =
       MyOptimization::BaseMath::GetFuncValueForArray(lambda_func, lambda_input);
+  auto std_function_lambda_res = MyOptimization::BaseMath::GetFuncValueForArray(
+      std_function_lambda, lambda_input);
 
   const int lambda_expected_res = 5.0;
   EXPECT_EQ(lambda_res, lambda_expected_res);
+  EXPECT_EQ(std_function_lambda_res, lambda_expected_res);
 
   std::array<float, 3> normal_input{2.f, 3.f, 6.f};
   auto normal_function_res = MyOptimization::BaseMath::GetFuncValueForArray(
@@ -262,6 +304,26 @@ TEST(FUNCTIONTEST, ArrayInputGradientCenteralStep) {
   }
 }
 
-}  // namespace
-}  // namespace BaseMath
-}  // namespace MyOptimization
+TEST(FUNCTIONTEST, StdFunctionArrayInputGradientCenteralStep) {
+
+  std::function<decltype(highOrderFunctionForThreeVariableFunc2)>
+      std_high_order_fun = highOrderFunctionForThreeVariableFunc2;
+  const float epsilon = 1e-3;
+  const double tolerance_error = 2 * 1e-1;
+  // highOrderFunctionForThreeVariableFunc2 : x * x + 2 * x * y + y / z;
+  std::array<double, 3> func_input{2.0, 3.0, 4.0};
+  auto func_res =
+      MyOptimization::BaseMath::GetNumericGrandientForArrayByCenteralDifference<
+          decltype(std_high_order_fun), double, 3>(std_high_order_fun,
+                                                   func_input, epsilon);
+  const std::vector<double> expected_func_gradients_output{10.0f, 4.25f,
+                                                           -(3 / 16)};
+  for (auto i = 0U; i < func_res.size(); ++i) {
+    EXPECT_LT(std::abs(func_res[i] - expected_func_gradients_output[i]),
+              tolerance_error);
+  }
+}
+
+} // namespace
+} // namespace BaseMath
+} // namespace MyOptimization
