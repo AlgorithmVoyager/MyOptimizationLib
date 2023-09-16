@@ -15,7 +15,8 @@ namespace BaseMath {
 /// @param: func: user self defined function
 /// @param: value: the input value of function
 /// @brief: the fuinction will return final value calculate by func
-template <typename Callable, typename T> T GetValue(Callable func, T t) {
+template <typename Callable, typename T>
+T GetValue(Callable func, T t) {
   // static_assert(std::is_function<Callable>::value,
   //               "input Func must be a function!!!");
   return func(t);
@@ -196,8 +197,8 @@ std::array<T, N> GetNumericGrandientForArrayByCenteralDifference(
   return gradients;
 }
 
-} // namespace BaseMath
+}  // namespace BaseMath
 
-} // namespace MyOptimization
+}  // namespace MyOptimization
 
-#endif // CORE_BASEMATH_FUNCTION_H
+#endif  // CORE_BASEMATH_FUNCTION_H
