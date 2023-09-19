@@ -14,29 +14,3 @@ cc_test(
         "@gtest//:gtest_main",
     ],
 )
-
-cc_test(
-    name = "utils_test",
-    srcs = [
-        "utils/utils_test.cpp",
-    ],
-    copts = ["-std=c++17"],
-    deps = [
-        "//core/ConvexOptimization/SteepestGradientDescent/utils",
-        "@gtest",
-        "@gtest//:gtest_main",
-    ],
-)
-
-cc_test(
-    name = "armijo_test",
-    srcs = [
-        "armijo_test.cpp",
-    ],
-    copts = ["-std=c++17"],
-    deps = [
-        "//core/ConvexOptimization/SteepestGradientDescent:armijo",
-        "@gtest",
-        "@gtest//:gtest_main",
-    ],
-)

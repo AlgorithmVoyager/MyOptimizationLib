@@ -1,6 +1,7 @@
 #ifndef CORE_BASEMATH_CONTAINER_H
 #define CORE_BASEMATH_CONTAINER_H
 
+#include <eigen3/Eigen/Core>
 #include <functional>
 #include <stdexcept>
 #include <type_traits>
@@ -60,7 +61,19 @@ auto CreateTupleFromArray(const std::array<T, N> array) {
   return CreateTupleFromArrayImpl(array, Indices{});
 }
 
-} // namespace BaseMath
-} // namespace MyOptimization
+template <typename T, std::size_t N, std::size_t... Index>
+auto CreateTupleFromEigenVectorImpl(Eigen::Matrix<T, N, 1> eigen_vector,
+                                    std::index_sequence<Index...>) {
+  return std::make_tuple(eigen_vector[Index]...);
+}
 
-#endif // CORE_BASEMATH_CONTAINER_H
+template <typename T, std::size_t N>
+auto CreateTupleFromEigenVector(Eigen::Matrix<T, N, 1> eigen_vector) {
+  return CreateTupleFromEigenVectorImpl<T, N>(eigen_vector,
+                                              std::make_index_sequence<N>{});
+}
+
+}  // namespace BaseMath
+}  // namespace MyOptimization
+
+#endif  // CORE_BASEMATH_CONTAINER_H

@@ -8,8 +8,8 @@
 #include <optional>
 
 #include "core/BaseMath/function.h"
-#include "core/ConvexOptimization/SteepestGradientDescent/armijo_condition.h"
-#include "core/ConvexOptimization/SteepestGradientDescent/utils/utils.h"
+#include "core/ConvexOptimization/StepSearch/armijo_condition.h"
+#include "core/ConvexOptimization/utils/utils.h"
 
 namespace MyOptimization {
 namespace ConvexOptimization {
