@@ -1,6 +1,7 @@
 #ifndef CORE_BASEMATH_FUNCTION_H
 #define CORE_BASEMATH_FUNCTION_H
 
+#include <eigen3/Eigen/Core>
 #include <functional>
 #include <stdexcept>
 #include <type_traits>
@@ -47,6 +48,22 @@ auto GetFuncValueForContainer(Callable func, Container container) {
 template <typename Callable, typename T, size_t N>
 T GetFuncValueForArray(Callable func, std::array<T, N> container) {
   return std::apply(func, CreateTupleFromArray(container));
+}
+
+/// @brief
+/// @tparam Callable
+/// @tparam Container
+/// @tparam N
+/// @param func
+/// @param container
+/// @return
+template <typename Callable, typename T, size_t N>
+T GetFuncValueForEigenVector(Callable func,
+                             Eigen::Matrix<T, N, 1> eigen_vector) {
+  if (eigen_vector.size() == 0) {
+    return 0.0;
+  }
+  return std::apply(func, CreateTupleFromEigenVector<T, N>(eigen_vector));
 }
 
 /// @brief : the function will return a numeric grdients in Container form
@@ -195,6 +212,124 @@ std::array<T, N> GetNumericGrandientForArrayByCenteralDifference(
   }
 
   return gradients;
+}
+
+template <typename Callable, typename T, size_t N>
+auto GetNumericGrandientForEigenVectorByForwardDifference(
+    Callable func, Eigen::Matrix<T, N, 1> input_vector, double epsilon)
+    -> Eigen::Matrix<T, N, 1> {
+  if (input_vector.size() == 0) return {};
+
+  const size_t vector_size = input_vector.size();
+
+  using EigenVector = Eigen::Matrix<T, N, 1>;
+
+  EigenVector gradients;
+
+  for (size_t i = 0U; i < vector_size; ++i) {
+    EigenVector last_half_step_inputs{input_vector};
+    EigenVector next_half_step_inputs{input_vector};
+    last_half_step_inputs(i) -= epsilon / 2;
+    next_half_step_inputs(i) += epsilon / 2;
+
+    // MLOG_ERROR("last_half_step_inputs " << last_half_step_inputs);
+
+    T next_half_step_value =
+        GetFuncValueForEigenVector<Callable, T, N>(func, next_half_step_inputs);
+    T last_half_step_value =
+        GetFuncValueForEigenVector<Callable, T, N>(func, last_half_step_inputs);
+
+    gradients(i) =
+        static_cast<T>((next_half_step_value - last_half_step_value) / epsilon);
+    // MLOG_ERROR("next_half_step_value " << next_half_step_value
+    //                                    << ", last_half_step_value "
+    //                                    << last_half_step_value <<
+    //                                    gradients(i));
+  }
+
+  return gradients;
+}
+
+template <typename Callable, typename T, size_t N>
+auto GetNumericHessianForEigenVectorByForwardDifference(
+    const double x_epsilon, const double y_epsilon,
+    const Eigen::Matrix<T, N, 1> eigen_vector, Callable func) {
+  using EigenVector = Eigen::Matrix<T, N, 1>;
+  using EigenMatrix = Eigen::Matrix<T, N, N>;
+
+  EigenMatrix hessian;
+  EigenVector input_vector(eigen_vector);
+
+  const size_t vector_size = eigen_vector.size();
+
+  if (vector_size == 0) return hessian;
+
+  T current_step_value =
+      GetFuncValueForEigenVector<Callable, T, N>(func, input_vector);
+
+  /**
+   *  for x,x
+   *  ((f(x+h)-f(x)/h) - (f(x)-f(x-h)/h))/h
+   *
+   *  for x,y
+   *  (f(x+h，y+k)-f(x+h,y-k)-f(x-h,y+k)+f(x-h,y-k))/4hk
+   *
+   */
+  for (size_t i = 0U; i < vector_size; ++i) {
+    input_vector(i) += x_epsilon;
+    T next_step_value =
+        GetFuncValueForEigenVector<Callable, T, N>(func, input_vector);
+    input_vector(i) -= 2 * x_epsilon;
+    T last_step_value =
+        GetFuncValueForEigenVector<Callable, T, N>(func, input_vector);
+    hessian(i, i) =
+        (next_step_value + last_step_value - 2 * current_step_value) /
+        (x_epsilon * x_epsilon);
+    // MLOG_ERROR("next_step_value " << next_step_value << ",last_step_value "
+    //                               << last_step_value << ",  hessian(i, i) "
+    //                               << hessian(i, i));
+
+    // reset input value
+    input_vector(i) = eigen_vector(i);
+
+    for (size_t j = i + 1; j < vector_size; ++j) {
+      // f(x+h,y+k)
+      input_vector(i) += x_epsilon;
+      input_vector(j) += y_epsilon;
+      T up_right_value =
+          GetFuncValueForEigenVector<Callable, T, N>(func, input_vector);
+      // f(x+h,y-k)
+      input_vector(j) -= 2 * y_epsilon;
+      T down_right_value =
+          GetFuncValueForEigenVector<Callable, T, N>(func, input_vector);
+      // f(x-h,y-k)
+      input_vector(i) -= 2 * x_epsilon;
+      T down_left_value =
+          GetFuncValueForEigenVector<Callable, T, N>(func, input_vector);
+      // f(x-h,y+k)
+      input_vector(j) += 2 * x_epsilon;
+      T up_left_value =
+          GetFuncValueForEigenVector<Callable, T, N>(func, input_vector);
+
+      // calculate current d^2f/dxdy
+      hessian(i, j) = (up_right_value + down_left_value - down_right_value -
+                       up_left_value) /
+                      (x_epsilon * y_epsilon);
+      hessian(j, i) = hessian(i, j);
+      // MLOG_ERROR("up_right_value "
+      //            << up_right_value << ",down_left_value " << down_left_value
+      //            << "down_left_value " << down_left_value << ",up_left_value
+      //            "
+      //            << up_left_value << ",  hessian(i, j) " << hessian(i, j));
+
+      // reset input value
+      input_vector(i) = eigen_vector(i);
+      input_vector(j) = eigen_vector(j);
+    }
+  }
+
+  // MLOG_ERROR("hessian " << hessian);
+  return hessian;
 }
 
 }  // namespace BaseMath

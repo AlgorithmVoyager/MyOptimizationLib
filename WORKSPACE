@@ -1,10 +1,10 @@
-load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
+load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive", "http_file")
 
 http_archive(
-  name = "gtest",
-   urls = ["https://github.com/google/googletest/archive/5ab508a01f9eb089207ee87fd547d290da39d015.zip"],
-  strip_prefix = "googletest-5ab508a01f9eb089207ee87fd547d290da39d015",
-)                   
+    name = "gtest",
+    strip_prefix = "googletest-5ab508a01f9eb089207ee87fd547d290da39d015",
+    urls = ["https://github.com/google/googletest/archive/5ab508a01f9eb089207ee87fd547d290da39d015.zip"],
+)
 
 http_archive(
     name = "com_github_gflags_gflags",
@@ -18,4 +18,27 @@ http_archive(
     sha256 = "122fb6b712808ef43fbf80f75c52a21c9760683dae470154f02bddfc61135022",
     strip_prefix = "glog-0.6.0",
     urls = ["https://github.com/google/glog/archive/v0.6.0.zip"],
+)
+
+# # Eigen
+# http_archive(
+#     name = "eigen3",
+#     build_file = "//:eigen.BUILD",
+#     sha256 = "8586084f71f9bde545ee7fa6d00288b264a2b7ac3607b974e54d13e7162c1c72",
+#     # strip_prefix = "eigen-3.4.0",
+#     url = "https://gitlab.com/libeigen/eigen/-/archive/3.4.0/eigen-3.4.0.tar.gz",
+# )
+
+http_file(
+    name = "eigen.BUILD",
+    sha256 = "c8805ce048e79b788c8a9b5ed853c4a864dbd88d9c7b395e34adebba7293ad75",
+    urls = ["https://raw.githubusercontent.com/tensorflow/tensorflow/v2.1.0/third_party/eigen.BUILD"],
+)
+
+http_archive(
+    name = "eigen",
+    build_file = "@eigen.BUILD//file:downloaded",
+    sha256 = "8586084f71f9bde545ee7fa6d00288b264a2b7ac3607b974e54d13e7162c1c72",
+    strip_prefix = "eigen-3.4.0",
+    url = "https://gitlab.com/libeigen/eigen/-/archive/3.4.0/eigen-3.4.0.tar.gz",
 )

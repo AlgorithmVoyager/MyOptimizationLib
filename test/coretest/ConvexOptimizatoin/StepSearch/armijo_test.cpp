@@ -1,6 +1,8 @@
-#include "core/ConvexOptimization/SteepestGradientDescent/armijo_condition.h"
-#include <array>
 #include <gtest/gtest.h>
+
+#include <array>
+
+#include "core/ConvexOptimization/StepSearch/armijo_condition.h"
 
 namespace MyOptimization {
 namespace ConvexOptimization {
@@ -11,7 +13,6 @@ float getValue(float x, float y) { return x * x + y * y; }
 TEST(FUNCTIONTEST, ArmijoParameterCheck) { ArmijoParameterCheck(0.9); }
 
 TEST(FUNCTIONTEST, LinearSearchWithArmijoCondition) {
-
   const float armijo_parameter = 0.9f;
   float step = 10.0f;
 
@@ -24,6 +25,6 @@ TEST(FUNCTIONTEST, LinearSearchWithArmijoCondition) {
   EXPECT_FLOAT_EQ(step, 0.078125);
 }
 
-} // namespace
-} // namespace ConvexOptimization
-} // namespace MyOptimization
+}  // namespace
+}  // namespace ConvexOptimization
+}  // namespace MyOptimization

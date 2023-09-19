@@ -1,6 +1,8 @@
-#include "core/ConvexOptimization/SteepestGradientDescent/utils/utils.h"
-#include <array>
+#include "core/ConvexOptimization/utils/utils.h"
+
 #include <gtest/gtest.h>
+
+#include <array>
 
 namespace MyOptimization {
 namespace ConvexOptimization {
@@ -62,6 +64,6 @@ TEST(FUNCTIONTEST, SelfAddArray) {
   EXPECT_FLOAT_EQ(init_input_value[2], 6.6);
 }
 
-} // namespace
-} // namespace ConvexOptimization
-} // namespace MyOptimization
+}  // namespace
+}  // namespace ConvexOptimization
+}  // namespace MyOptimization
