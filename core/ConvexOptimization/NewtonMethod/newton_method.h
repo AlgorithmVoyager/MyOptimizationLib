@@ -13,15 +13,15 @@ namespace ConvexOptimization {
  *  x_k+1 = x_k -(d^2f)^(-1)Df
  * */
 template <typename T, size_t N>
-class NetwonMethod {
+class NewtonMethod {
  public:
   using EigenMatrix = Eigen::Matrix<T, N, N>;
   using EigenVector = Eigen::Matrix<T, N, 1>;
 
-  NetwonMethod() = delete;
-  ~NetwonMethod(){};
+  NewtonMethod() = delete;
+  ~NewtonMethod(){};
 
-  NetwonMethod(const float iteration_error, EigenVector init_pos)
+  NewtonMethod(const float iteration_error, EigenVector init_pos)
       : iteration_error_(iteration_error), search_results_(init_pos) {}
 
   template <typename Function>

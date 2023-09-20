@@ -184,6 +184,58 @@ void SecondOrderSearchWithArmijoCondition(
   return;
 }
 
+template <typename Func, typename T, size_t N>
+void LinearSearchForEigenVectorWithArmijoCondition(
+    const T armijo_parameter, const T step_coefficient, T &step,
+    Eigen::Matrix<T, N, 1> current_step_input_value,
+    Eigen::Matrix<T, N, 1> gradients, Func func) {
+  // static_assert(std::is_function_v<Func>, "Func must be a function");
+
+  const T stop_step = 1e-8;
+
+  const T function_value_in_init_step =
+      MyOptimization::BaseMath::GetFuncValueForEigenVector<Func, T, N>(
+          func, current_step_input_value);
+  const T product_of_gradients_with_gradients = -1.0 * gradients.dot(gradients);
+
+  // c * t * d^T * Df(x^k), d = - Df(x^k)
+  while (MyOptimization::BaseMath::GetFuncValueForEigenVector<Func, T, N>(
+             func, MyOptimization::ConvexOptimization::utils::
+                       GetNextStepInputValueForEigenVector<T, N>(
+                           current_step_input_value, gradients, step)) >
+         (function_value_in_init_step +
+          (armijo_parameter * step * product_of_gradients_with_gradients))) {
+    // [ debug info ]
+    // MLOG_INFO(
+    //     "f(x+td)  "
+    //     << MyOptimization::BaseMath::GetFuncValueForEigenVector<Func, T, N>(
+    //            func,
+    //            MyOptimization::ConvexOptimization::utils::GetNextStepInputValueForEigenVector(
+    //                current_step_input_value, gradients, step))
+    //     << ",\n f(x) " << function_value_in_init_step << "\n c_p "
+    //     << (armijo_parameter * step * product_of_gradients_with_gradients));
+
+    step *= step_coefficient;
+    if (step < stop_step) {
+      MLOG_ERROR("step has minize als "
+                 << stop_step << ", but linear search still not finished !!!");
+      break;
+    }
+  }
+
+  // [ debug info ]
+  // MLOG_INFO(
+  //     "f(x+td)  "
+  //     << MyOptimization::BaseMath::GetFuncValueForArray(
+  //            func,
+  //            MyOptimization::ConvexOptimization::utils::GetNextStepInputValueForEigenVector(
+  //                current_step_input_value, gradients, step))
+  //     << ",\n f(x) " << function_value_in_init_step << "\n c_p "
+  //     << (armijo_parameter * step * product_of_gradients_with_gradients));
+
+  return;
+}
+
 }  // namespace ConvexOptimization
 }  // namespace MyOptimization
 
