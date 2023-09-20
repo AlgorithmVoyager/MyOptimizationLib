@@ -12,13 +12,13 @@ namespace MyOptimization {
 namespace ConvexOptimization {
 
 template <typename T, size_t N>
-class NetwonMethodLinearSearch {
+class NewtonMethodLinearSearch {
  public:
   using EigenMatrix = Eigen::Matrix<T, N, N>;
   using EigenVector = Eigen::Matrix<T, N, 1>;
 
-  NetwonMethodLinearSearch() = delete;
-  ~NetwonMethodLinearSearch(){};
+  NewtonMethodLinearSearch() = delete;
+  ~NewtonMethodLinearSearch(){};
   /// @brief : constructor function for newton method with linear search
   /// ! for non Convex problem, newton method may get better results, because
   /// ! for linear search will delete h(x) part. later a better version will be
@@ -28,7 +28,7 @@ class NetwonMethodLinearSearch {
   /// ! (0,0.5),search result is better
   /// @param step
   /// @param init_pos
-  NetwonMethodLinearSearch(const float iteration_error, const float parameter,
+  NewtonMethodLinearSearch(const float iteration_error, const float parameter,
                            const float step, EigenVector init_pos)
       : iteration_error_(iteration_error),
         armijo_parameter_(parameter),

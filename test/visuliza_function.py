@@ -11,9 +11,9 @@ fig = plt.figure()
 ax = fig.add_subplot(111,projection='3d')
 ax.plot_surface(X,Y,Z)
 
-plt.show()
+# plt.show()
 
-a= 10.0561
-b= 101.141
+a= 35.6596
+b= 1271.43
 c= 100*(a**2-b)**2+(a-1)**2
 print(c)

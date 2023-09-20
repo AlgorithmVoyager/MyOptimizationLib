@@ -3,6 +3,7 @@
 
 #include <algorithm>
 #include <array>
+#include <eigen3/Eigen/Dense>
 #include <numeric>
 #include <stdexcept>
 
@@ -73,6 +74,23 @@ namespace utils {
 // }
 
 template <typename T, size_t N>
+Eigen::Matrix<T, N, 1> GetNextStepInputValueForEigenVector(
+    const Eigen::Matrix<T, N, 1> &init_input_value,
+    const Eigen::Matrix<T, N, 1> &gradients, const float step) {
+  if (init_input_value.size() != gradients.size()) {
+    try {
+      throw std::runtime_error(
+          "Input value and gradients value size not same!!!");
+    } catch (const std::exception &e) {
+      MLOG_ERROR("[Runtime Error]: " << e.what());
+    }
+  }
+  Eigen::Matrix<T, N, 1> next_step_input_value;
+  next_step_input_value.noalias() = init_input_value + step * gradients;
+  return next_step_input_value;
+}
+
+template <typename T, size_t N>
 std::array<T, N> GetNextStepInputValue(const std::array<T, N> &init_input_value,
                                        const std::array<T, N> &gradients,
                                        const float step) {
@@ -91,6 +109,20 @@ std::array<T, N> GetNextStepInputValue(const std::array<T, N> &init_input_value,
       [&step](const T &lhs, const T &rhs) { return lhs + step * rhs; });
   return next_step_input_value;
 }
+
+// template <typename T, size_t N>
+// T GetDotProductOfTwoEigenVector(const Eigen::Matrix<T, N, 1> &lhs,
+//                                 const Eigen::Matrix<T, N, 1> &rhs) {
+//   if (lhs.size() != rhs.size()) {
+//     try {
+//       throw std::runtime_error("The inputed Two Array's size not same!!!");
+//     } catch (const std::exception &e) {
+//       MLOG_ERROR("[Runtime Error]: " << e.what());
+//     }
+//   }
+
+//   return lhs.dot(rhs);
+// }
 
 template <typename T, size_t N>
 T GetDotProductOfTwoArray(const std::array<T, N> &lhs,
@@ -140,9 +172,9 @@ void SelfAddArray(const std::array<T, N> &increment_input_value,
   return;
 }
 
-} // namespace utils
-} // namespace ConvexOptimization
+}  // namespace utils
+}  // namespace ConvexOptimization
 
-} // namespace MyOptimization
+}  // namespace MyOptimization
 
-#endif // CORE_CONVEXOPTIMIZATION_STEEPESTGRADIENTDESCENT_UTILS_UTILS_H
+#endif  // CORE_CONVEXOPTIMIZATION_STEEPESTGRADIENTDESCENT_UTILS_UTILS_H

@@ -20,8 +20,8 @@ double square_three_dimensional(double x, double y, double z) {
 //   Eigen::VectorXd init_pos(2);
 //   init_pos << 2.0, 3.0;
 
-//   std::shared_ptr<NetwonMethod<double, 2>> newton_method_ptr =
-//       std::make_shared<NetwonMethod<double, 2>>(iteration_error, init_pos);
+//   std::shared_ptr<NewtonMethod<double, 2>> newton_method_ptr =
+//       std::make_shared<NewtonMethod<double, 2>>(iteration_error, init_pos);
 
 //   newton_method_ptr->UpdateSearchDirection<decltype(square)>(square,
 //   epsilon);
@@ -42,8 +42,8 @@ double square_three_dimensional(double x, double y, double z) {
 //   Eigen::VectorXd init_pos(2);
 //   init_pos << 2.0, 3.0;
 
-//   std::shared_ptr<NetwonMethod<double, 2>> newton_method_ptr =
-//       std::make_shared<NetwonMethod<double, 2>>(iteration_error, init_pos);
+//   std::shared_ptr<NewtonMethod<double, 2>> newton_method_ptr =
+//       std::make_shared<NewtonMethod<double, 2>>(iteration_error, init_pos);
 
 //   newton_method_ptr->UpdateNewtonStep<decltype(square)>(square, x_epsilon,
 //                                                         y_epsilon);
@@ -70,8 +70,8 @@ TEST(FUNCTIONTEST, StepTwoDimensional) {
   Eigen::VectorXd init_pos(2);
   init_pos << 0.1, 0.4;
 
-  std::shared_ptr<NetwonMethod<double, 2>> newton_method_ptr =
-      std::make_shared<NetwonMethod<double, 2>>(iteration_error, init_pos);
+  std::shared_ptr<NewtonMethod<double, 2>> newton_method_ptr =
+      std::make_shared<NewtonMethod<double, 2>>(iteration_error, init_pos);
 
   newton_method_ptr->Step<decltype(square)>(x_epsilon, y_epsilon, square);
 
@@ -93,8 +93,8 @@ TEST(FUNCTIONTEST, StepThreeDimensional) {
   Eigen::VectorXd init_pos(3);
   init_pos << 1, 4, 43;
 
-  std::shared_ptr<NetwonMethod<double, 3>> newton_method_ptr =
-      std::make_shared<NetwonMethod<double, 3>>(iteration_error, init_pos);
+  std::shared_ptr<NewtonMethod<double, 3>> newton_method_ptr =
+      std::make_shared<NewtonMethod<double, 3>>(iteration_error, init_pos);
 
   newton_method_ptr->Step<decltype(square_three_dimensional)>(
       x_epsilon, y_epsilon, square_three_dimensional);

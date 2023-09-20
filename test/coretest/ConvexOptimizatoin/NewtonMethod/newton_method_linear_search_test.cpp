@@ -23,8 +23,8 @@ TEST(FUNCTIONTEST, STEP) {
   Eigen::VectorXd init_pos(2);
   init_pos << 0.1, 0.4;
 
-  std::shared_ptr<NetwonMethodLinearSearch<double, 2>> newton_method_ptr =
-      std::make_shared<NetwonMethodLinearSearch<double, 2>>(
+  std::shared_ptr<NewtonMethodLinearSearch<double, 2>> newton_method_ptr =
+      std::make_shared<NewtonMethodLinearSearch<double, 2>>(
           iteration_error, parameter, step, init_pos);
 
   newton_method_ptr->Step<decltype(square)>(x_epsilon, y_epsilon, square);
@@ -49,8 +49,8 @@ TEST(FUNCTIONTEST, StepThreeDimensional) {
   Eigen::VectorXd init_pos(3);
   init_pos << 1, 2, 3;
 
-  std::shared_ptr<NetwonMethodLinearSearch<double, 3>> newton_method_ptr =
-      std::make_shared<NetwonMethodLinearSearch<double, 3>>(
+  std::shared_ptr<NewtonMethodLinearSearch<double, 3>> newton_method_ptr =
+      std::make_shared<NewtonMethodLinearSearch<double, 3>>(
           iteration_error, parameter, step, init_pos);
 
   newton_method_ptr->Step<decltype(square_three_dimensional)>(
