@@ -1,6 +1,7 @@
 #include <memory>
 
 #include "core/ConvexOptimization/QuasiNetwonMethod/bfgs.h"
+#include "core/ConvexOptimization/QuasiNetwonMethod/limit_memory_newton_method.h"
 #include "logging/log.h"
 
 namespace {
@@ -44,16 +45,27 @@ int main() {
   Eigen::VectorXd init_pos(2);
   init_pos << 50, 30;
 
-  std::shared_ptr<MyOptimization::ConvexOptimization::BFGS<double, 2>>
-      bfgs_ptr =
-          std::make_shared<MyOptimization::ConvexOptimization::BFGS<double, 2>>(
-              init_pos, iteration_error, parameter, step);
+  // * use bfgs method
+  // std::shared_ptr<MyOptimization::ConvexOptimization::BFGS<double, 2>>
+  //     bfgs_ptr =
+  //         std::make_shared<MyOptimization::ConvexOptimization::BFGS<double,
+  //         2>>(
+  //             init_pos, iteration_error, parameter, step);
 
-  bfgs_ptr->Step<decltype(TwoDimensionalRosenBlockFunc)>(
-      TwoDimensionalRosenBlockFunc);
+  // bfgs_ptr->Step<decltype(TwoDimensionalRosenBlockFunc)>(
+  //     TwoDimensionalRosenBlockFunc);
+
+  // * use limit memory bfgs method
+  std::shared_ptr<MyOptimization::ConvexOptimization::
+                      LimitMemoryCautiousBFGSWithWolfe<double, 2, 6>>
+      bfgs_ptr =
+          std::make_shared<MyOptimization::ConvexOptimization::
+                               LimitMemoryCautiousBFGSWithWolfe<double, 2, 6>>(
+              init_pos, iteration_error, step);
+
+  // bfgs_ptr->Step<decltype(TwoDimensionalRosenBlockFunc)>(
+  //     TwoDimensionalRosenBlockFunc);
 
   auto res = bfgs_ptr->GetSearchResults();
-  MLOG_ERROR("res " << res);
-
   MLOG_ERROR("res " << res);
 }
