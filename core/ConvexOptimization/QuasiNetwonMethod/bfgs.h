@@ -36,6 +36,10 @@ class BFGS {
 
   const EigenVector GetSearchResults() const { return search_results_; }
 
+  void ResetInitPos(const EigenVector& init_pos) {
+    search_results_.noalias() = init_pos;
+  }
+
   template <typename Callable>
   void Step(Callable func) {
     // * init

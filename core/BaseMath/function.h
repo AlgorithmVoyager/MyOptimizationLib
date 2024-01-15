@@ -3,6 +3,7 @@
 
 #include <eigen3/Eigen/Core>
 #include <functional>
+#include <numeric>
 #include <stdexcept>
 #include <type_traits>
 #include <utility>
@@ -63,7 +64,14 @@ T GetFuncValueForEigenVector(Callable func,
   if (eigen_vector.size() == 0) {
     return 0.0;
   }
-  return std::apply(func, CreateTupleFromEigenVector<T, N>(eigen_vector));
+
+  // * for function form like f(eigen_vector)
+  if constexpr (std::is_invocable_v<Callable, Eigen::Matrix<T, N, 1>>) {
+    return std::invoke(func, eigen_vector);
+  } else {
+    // * for function form like f(x1,x2,...)
+    return std::apply(func, CreateTupleFromEigenVector<T, N>(eigen_vector));
+  }
 }
 
 /// @brief : the function will return a numeric grdients in Container form

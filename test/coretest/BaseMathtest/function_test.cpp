@@ -2,6 +2,8 @@
 
 #include <gtest/gtest.h>
 
+#include <eigen3/Eigen/Dense>
+
 namespace MyOptimization {
 namespace BaseMath {
 namespace {
@@ -11,6 +13,15 @@ inline int normalMultiAddFunction(int x, int y, int z) { return x + y + z; }
 inline auto normalMultiTypeAddFunction(int x, float y, double z)
     -> decltype(x + y + z) {
   return x + y + z;
+}
+
+template <typename T, size_t N>
+double GetEigenRes(Eigen::Matrix<T, N, 1> a) {
+  double res = 0.0;
+  for (auto it = 0; it < a.size(); ++it) {
+    res += a.coeff(it);
+  }
+  return res;
 }
 
 template <typename T>
@@ -305,7 +316,6 @@ TEST(FUNCTIONTEST, ArrayInputGradientCenteralStep) {
 }
 
 TEST(FUNCTIONTEST, StdFunctionArrayInputGradientCenteralStep) {
-
   std::function<decltype(highOrderFunctionForThreeVariableFunc2)>
       std_high_order_fun = highOrderFunctionForThreeVariableFunc2;
   const float epsilon = 1e-3;
@@ -324,6 +334,29 @@ TEST(FUNCTIONTEST, StdFunctionArrayInputGradientCenteralStep) {
   }
 }
 
-} // namespace
-} // namespace BaseMath
-} // namespace MyOptimization
+TEST(FUNCTIONTEST, GetEigenResTEST) {
+  Eigen::Matrix<double, 3, 1> a;
+  a << 1.0, 2.0, 3.0;
+
+  auto getRes = [](Eigen::Matrix<double, 3, 1> a) -> double { return a(0); };
+
+  double func_res = MyOptimization::BaseMath::GetFuncValueForEigenVector<
+      decltype(GetEigenRes<double, 3>), double, 3>(GetEigenRes<double, 3>, a);
+
+  MLOG_ERROR("func_res == " << func_res);
+
+  double func_res_lambda =
+      MyOptimization::BaseMath::GetFuncValueForEigenVector<decltype(getRes),
+                                                           double, 3>(getRes,
+                                                                      a);
+
+  MLOG_ERROR("func_res_lambda == " << func_res_lambda);
+
+  double func_res_new = MyOptimization::BaseMath::GetFuncValueForEigenVector<
+      decltype(normalMultiAddFunction), double, 3>(normalMultiAddFunction, a);
+  MLOG_ERROR("func_res_new == " << func_res_new);
+}
+
+}  // namespace
+}  // namespace BaseMath
+}  // namespace MyOptimization
