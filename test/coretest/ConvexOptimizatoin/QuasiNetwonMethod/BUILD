@@ -37,3 +37,27 @@ cc_test(
         "@gtest//:gtest_main",
     ],
 )
+
+cc_test(
+    name = "conjugate_gradient_test",
+    srcs = [
+        "linear_newton_conjugate_gradient_method_test.cpp",
+    ],
+    deps = [
+        "//core/ConvexOptimization/QuasiNetwonMethod:quasi_newton_method",
+        "@gtest",
+        "@gtest//:gtest_main",
+    ],
+)
+
+cc_test(
+    name = "truncated_newton_cg_test",
+    srcs = [
+        "truncated_newton_cg_test.cpp",
+    ],
+    deps = [
+        "//core/ConvexOptimization/QuasiNetwonMethod:quasi_newton_method",
+        "@gtest",
+        "@gtest//:gtest_main",
+    ],
+)
